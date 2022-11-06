@@ -34,10 +34,10 @@ def index(request):
 
     # most_popular_posts = []  # TODO. Как это посчитать?
 
-    posts = Post.objects.annotate(num_likes=Count('likes')).order_by('-num_likes')
+    posts = Post.objects.annotate(num_likes=Count('likes')).order_by('-num_likes').prefetch_related('author') #.prefetch_related('tags')
     most_popular_posts = posts[:5]
 
-    fresh_posts = Post.objects.order_by('published_at')
+    fresh_posts = Post.objects.order_by('published_at').prefetch_related('author') #.prefetch_related('tags')
     most_fresh_posts = list(fresh_posts)[-5:]
 
     tags = Tag.objects.annotate(num_posts=Count('posts')).order_by('-num_posts')
