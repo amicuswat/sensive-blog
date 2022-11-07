@@ -26,7 +26,7 @@ def serialize_post_optimized(post):
         'title': post.title,
         'teaser_text': post.text[:200],
         'author': post.author.username,
-        'comments_amount': len(Comment.objects.filter(post=post)),
+        'comments_amount': post.comments.count(),
         'image_url': post.image.url if post.image else None,
         'published_at': post.published_at,
         'slug': post.slug,
@@ -48,10 +48,10 @@ def index(request):
 
     # most_popular_posts = []  # TODO. Как это посчитать?
 
-    posts = Post.objects.annotate(num_likes=Count('likes')).order_by('-num_likes').prefetch_related('author') #.prefetch_related('tags')
+    posts = Post.objects.annotate(num_likes=Count('likes')).order_by('-num_likes').prefetch_related('author').prefetch_related('comments') #.prefetch_related('tags')
     most_popular_posts = posts[:5]
 
-    fresh_posts = Post.objects.order_by('published_at').prefetch_related('author') #.prefetch_related('tags')
+    fresh_posts = Post.objects.order_by('published_at').prefetch_related('author').prefetch_related('comments') #.prefetch_related('tags')
     most_fresh_posts = list(fresh_posts)[-5:]
 
     tags = Tag.objects.annotate(num_posts=Count('posts')).order_by('-num_posts')
