@@ -16,6 +16,12 @@ class PostQuerySet(models.QuerySet):
         return popular_posts
 
     def fetch_with_comments_count(self):
+        '''
+        Пояснение чем функция лучше annotate.
+        в случае annotate собирались посты для всех объектов.
+        В данном случаи посты собираются только для отфильтрованных объектов и
+        это экономит значительное время на обработку запроса
+        '''
         most_pupular_posts_ids = [post.id for post in self]
 
         posts_with_comments = Post.objects.filter(
