@@ -22,18 +22,19 @@ class PostQuerySet(models.QuerySet):
         В данном случаи посты собираются только для отфильтрованных объектов и
         это экономит значительное время на обработку запроса
         '''
-        most_pupular_posts_ids = [post.id for post in self]
+        posts = list(self)
+        most_pupular_posts_ids = [post.id for post in posts]
 
         posts_with_comments = Post.objects.filter(
             id__in=most_pupular_posts_ids).annotate(
-            comments_count=models.Count('comments')).prefetch_related('tags')
+            comments_count=models.Count('comments'))
         ids_and_comments = posts_with_comments.values_list('id',
                                                            'comments_count')
         count_for_id = dict(ids_and_comments)
 
-        for post in posts_with_comments:
+        for post in posts:
             post.comments_count = count_for_id[post.id]
-        return posts_with_comments
+        return posts
 
 
 class TagQuerySet(models.QuerySet):
