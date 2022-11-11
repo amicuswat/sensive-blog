@@ -26,14 +26,14 @@ class PostQuerySet(models.QuerySet):
 
         posts_with_comments = Post.objects.filter(
             id__in=most_pupular_posts_ids).annotate(
-            comments_count=models.Count('comments'))
+            comments_count=models.Count('comments')).prefetch_related('tags')
         ids_and_comments = posts_with_comments.values_list('id',
                                                            'comments_count')
         count_for_id = dict(ids_and_comments)
 
-        for post in self:
+        for post in posts_with_comments:
             post.comments_count = count_for_id[post.id]
-        return self
+        return posts_with_comments
 
 
 class TagQuerySet(models.QuerySet):
